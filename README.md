@@ -2,4 +2,5 @@ Hello! My name is Mercedes Olmsted and I am completing my MS in Quantitative Met
 
 
 ![image](https://github.com/mgolmsted/D3Primavera24/assets/158622638/bd7befc0-a1f3-4174-af84-623b781c5814)
+
 reference: https://www.nytimes.com/2018/06/28/travel/what-to-do-in-buffalo-ny.html
