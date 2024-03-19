@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Scatter Symbols</title>
+        <script src= "https://d3js.org/d3.v7.min.js"></script>
+        <style type="text/css">
+            /* We are adding our CSS up here in <style> but
+            referencing our classes in the D3 code below*/
+            
+            .axis path, 
+            .axis line{
+                stroke: rgb(233, 56, 171);
+            }
+            
+            .axis text{
+                font-family: sans-serif;
+                font-size: 10px;
+                font-weight: bold;
+                fill: rgb(233, 56, 171);
+            }
+            
+            .diamonds {
+                fill: rgb(252, 214, 0);
+                stroke: rgb(233, 56, 171);
+                stroke-width: 1px;
+            }
+
+            .labels {
+                font-family: sans-serif;
+                font-size: 10px;
+                fill: rgb(77, 237, 8);
+            }
+
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+            
+            //Consts/global variables  
+            const w = 500;
+            const h = 500;
+            const margin = 100;//rename to margin
+
+            //Data 
+            d3.csv("diamond.csv").then(data => {
+            console.log("data", data)
+        
+                //format data
+                data.forEach(d => { 
+                d.item = d.item;
+                d.x = +d.x;
+                d.y = +d.y;  
+                });
+            
+            //scales - with d3.max()
+            const xScale = d3.scaleLinear()
+                             .domain([0, d3.max(data, d => d.x)]) 
+                             .range([margin, w-margin]); 
+
+            const yScale = d3.scaleLinear()
+                             .domain([0, d3.max(data, d => d.y)]) 
+                             .range([h-margin, margin]); 
+
+            //SVG
+            const svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", w)
+                    .attr("height", h);
+
+            //axes 
+            const bottomAxis = d3.axisBottom()
+                                .scale(xScale)
+                                .ticks(10);
+            
+            //implement 
+            svg.append("g")
+                .attr("class", "axis") 
+                .attr("transform", "translate(0," + (h-margin) + ")") 
+                .call(bottomAxis);
+
+            const leftAxis = d3.axisLeft()
+                             .scale(yScale)
+                             .ticks(10);
+            
+            //implement 
+            svg.append("g")
+               .attr("class", "axis") 
+               .attr("transform", "translate(" + margin + ",0)")
+               .call(leftAxis);
+
+
+            
+            const symbolData = d3.symbol()
+                             .type(d3.symbolDiamond)
+                             .size(150); //64 is default            
+             
+            //diamonds with labels
+            const stars = svg.selectAll("g.diamonds")
+                              .data(data)
+                              .enter().append("g");
+            
+            stars.append("path")
+                .attr("class", "diamonds")
+                .attr("d", symbolData)
+                .attr("transform", d => "translate(" + xScale(d.x) + "," + yScale(d.y) + ")");
+
+            stars.append("text")
+                .attr("class", "labels")
+                .attr("x", d=> xScale(d.x)+8)
+                .attr("y",d=> yScale(d.y) +4)
+                .text(d=>d.item);
+            });
+        </script>
+    </body>
+</html>
