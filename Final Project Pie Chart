@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Pie and Doughnut</title>
+        <script src= "https://d3js.org/d3.v7.min.js"></script>
+        <style type="text/css">
+            
+            .labels{
+            font-size: 12px;
+            font-weight: bold;
+            font-family: sans-serif;
+          }
+
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+        
+            //Data
+            //*data taken from Back Firing: The Impacts of Drug Prohibition on the Criminal Justice System Budgets in Rio de Janeiro and São Paulo - Centro de Estudos de Segurança e Cidadania
+            //https://cdn.sanity.io/files/6u5teakk/production/333041e21b5517d52c75489023354c6d68bd0037.pdf?dl=
+             
+            d3.csv("Drug_Act.csv").then(data => {
+                console.log("data", data)
+            
+                    //format data
+                    data.forEach(d => { 
+                    d.institution= d.institution;
+                    d.totalexpenditures = +d.totalexpenditures;
+                    });
+                
+            //declare consts
+            const w = 500;
+            const h = 500;
+            //const myColor = d3.scaleOrdinal(d3.schemeSpectral[5]);
+            const myColor = d3.scaleOrdinal(["pink", "lightgreen", "orange", "lightblue", "purple", "yellow", "lightgray"]);
+
+            //Radius information
+            const outerRadius = w/2;
+            //const outerRadius = 200;
+            const innerRadius = 0; 
+           
+           
+            //d3.arc()creates our wedges 
+            const arc = d3.arc()  
+                           .innerRadius(innerRadius)//required 
+                           .outerRadius(outerRadius) //required
+                           //.cornerRadius(10);
+                           //.cornerRadius(100);
+
+            //pie generator
+            const pie = d3.pie().value(d=>d.totalexpenditures)
+                            //.padAngle(.04);
+                            //.startAngle(-0.5 * Math.PI)
+                            //.endAngle(0.5 * Math.PI);
+                            //.startAngle(0 * Math.PI)
+                            //.endAngle(1 * Math.PI);
+                            //.startAngle(0 * Math.PI)
+                            //.endAngle(0.5 * Math.PI);
+                            // .startAngle(0.5 * Math.PI)
+                            // .endAngle(2 * Math.PI);
+                            // .startAngle(-0.5 * Math.PI)
+                            // .endAngle(0 * Math.PI);
+
+            //SVG
+            const svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", w)
+                    .attr("height", h);
+
+                    // Add title to the SVG
+                    svg.append("title")
+                    .text("Rio de Janeiro Drug Act Expenditures, 2020");
+
+                    //groups to build chart
+            const groups = svg.selectAll("g.arc")
+                            .data(pie(data))
+                            .enter()
+                            .append("g")
+                            .attr("class", "arc")
+                            .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");//arcs transform translate 
+                            console.log("pie data", pie(data));
+            
+            groups.append("path")
+                .attr("fill", (d,i)=> myColor(i))
+                .attr("d", arc); 
+
+            //Labels
+            groups.append("text")
+                  .attr("transform", d=> "translate(" + arc.centroid(d) + ")")
+                  .attr("text-anchor", "middle")
+                  .attr("class", "labels")
+                  .text(d=>d.data.institution);
+
+
+                // Function to calculate the middle angle of the arc
+                    function midAngle(d) {
+                    return d.startAngle + (d.endAngle - d.startAngle) / 2;
+                    }
+
+           
+            });
+
+        </script>
+    </body>
+</html>
