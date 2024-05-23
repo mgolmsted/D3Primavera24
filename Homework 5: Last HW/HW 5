@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Pie and Doughnut</title>
+        <script src= "https://d3js.org/d3.v7.min.js"></script>
+        <style type="text/css">
+            
+            .labels{
+            font-size: 12px;
+            font-weight: bold;
+            font-family: sans-serif;
+          }
+
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+        
+            //Data
+            //*data sourced from https://paradisevalley.libguides.com/afrolatinos/history#:~:text=Countries%20with%20significant%20African%2C%20Mulatto,Ecuador%20(1.1%20million)1.
+             
+            d3.csv("Afro-Latiné Populations.csv").then(data => {
+                console.log("data", data)
+            
+                    //format data
+                    data.forEach(d => { 
+                    d.part = d.part;
+                    d.amount = +d.amount;
+                    });
+                
+    
+            const w = 500;
+            const h = 500;
+            
+            const myColor = d3.scaleOrdinal(["blue", "orange", "lightpink", "royalblue", "lightgreen", "hotpink", "yellow", "purple"]);
+
+          
+            const outerRadius = w/2;
+          
+            const innerRadius = 0; 
+            
+           
+           
+            const arc = d3.arc()  
+                           .innerRadius(innerRadius) 
+                           .outerRadius(outerRadius) 
+                           //.cornerRadius(10);
+                           //.cornerRadius(100);
+
+          
+            const pie = d3.pie().value(d=>d.amount)
+                            //.padAngle(.04);
+                            //.startAngle(-0.5 * Math.PI)
+                            //.endAngle(0.5 * Math.PI);
+                            //.startAngle(0 * Math.PI)
+                            //.endAngle(1 * Math.PI);
+                            //.startAngle(0 * Math.PI)
+                            //.endAngle(0.5 * Math.PI);
+                            // .startAngle(0.5 * Math.PI)
+                            // .endAngle(2 * Math.PI);
+                            // .startAngle(-0.5 * Math.PI)
+                            // .endAngle(0 * Math.PI);
+
+            //SVG
+            const svg = d3.select("body")
+                    .append("svg")
+                    .attr("width", w)
+                    .attr("height", h);
+
+                    svg.append("text")
+                    .attr("x", w / 2)
+                    .attr("y", 515)
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "24px")
+                    .text("Largest Afro-Latiné Populations Worldwide");
+
+          
+            const groups = svg.selectAll("g.arc")
+                            .data(pie(data))
+                            .enter()
+                            .append("g")
+                            .attr("class", "arc")
+                            .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");//arcs transform translate 
+                            console.log("pie data", pie(data));
+            
+            groups.append("path")
+                .attr("fill", (d,i)=> myColor(i))
+                .attr("d", arc); 
+
+            //Labels
+            groups.append("text")
+                  .attr("transform", d=> "translate(" + arc.centroid(d) + ")")
+                  .attr("text-anchor", "middle")
+                  .attr("class", "labels")
+                  .text(d=>d.data.part);
+
+          
+            });
+
+        </script>
+    </body>
+</html>
